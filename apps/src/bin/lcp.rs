@@ -79,6 +79,7 @@ impl std::str::FromStr for SymmetryBreakingType {
 }
 
 fn main() -> Result<()> {
+    let origin_timepoint = Instant::now();
     let opt: Opt = Opt::from_args();
 
     let problem_file = &opt.problem;
@@ -131,13 +132,18 @@ fn main() -> Result<()> {
         println!("  [{:.3}s] solved", start.elapsed().as_secs_f32());
         match result {
             Some(x) => {
+                println!("====================");
                 println!("  Solution found");
+                println!("  Total time to find plan: {:.3}s", origin_timepoint.elapsed().as_secs_f32());
                 let plan = if htn_mode {
                     format_hddl_plan(&pb, &x)?
                 } else {
                     format_pddl_plan(&pb, &x)?
                 };
+                println!("Plan:");
                 println!("{}", plan);
+                println!("====================");
+
                 if let Some(plan_out_file) = opt.plan_out_file {
                     let mut file = File::create(plan_out_file)?;
                     file.write_all(plan.as_bytes())?;
